@@ -35,14 +35,14 @@ RERANKER_MODELS = ["rerank-2.5", "rerank-2.5-lite"]
 class TextInput(BaseModel):
     text: str
     model: str = "voyage-3.5"
-    input_type: Optional[str] = "query"
+    input_type: Optional[str] = "document"
     truncation: Optional[bool] = True
     output_dimension: Optional[int] = 1024
 
 class BatchTextInput(BaseModel):
     texts: List[str]
     model: str = "voyage-3.5"
-    input_type: Optional[str] = "query"
+    input_type: Optional[str] = "document"
     truncation: Optional[bool] = True
     output_dimension: Optional[int] = 1024
 
@@ -50,14 +50,14 @@ class TextSimilarityInput(BaseModel):
     text1: str
     text2: str
     model: str = "voyage-3.5"
-    input_type: Optional[str] = "query"
+    input_type: Optional[str] = "document"
     truncation: Optional[bool] = True
     output_dimension: Optional[int] = 1024
 
 class MultiModelTextSimilarityInput(BaseModel):
     text1: str
     text2: str
-    input_type: Optional[str] = "query"
+    input_type: Optional[str] = "document"
     truncation: Optional[bool] = True
     output_dimension: Optional[int] = 1024
 
