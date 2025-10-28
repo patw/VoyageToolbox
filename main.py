@@ -70,7 +70,7 @@ class RerankInput(BaseModel):
     query: str
     documents: List[str]
     model: str = "rerank-2.5"
-    top_k: Optional[int] = None
+    top_k: Optional[int] = 5
     truncation: Optional[bool] = True
 
 # Utility functions
