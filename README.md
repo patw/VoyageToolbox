@@ -9,9 +9,9 @@ A comprehensive FastAPI wrapper for Voyage.ai, providing easy-to-use REST API en
 - Batch text embedding generation (up to 1,000 texts)
 - Text-to-text similarity calculation
 - Support for multiple models:
-  - `voyage-3-large`
-  - `voyage-3.5` (default)
-  - `voyage-3.5-lite`
+  - `voyage-4-large`
+  - `voyage-4` (default)
+  - `voyage-4-lite`
   - `voyage-code-3`
 
 ### Multimodal Image Embeddings
@@ -76,7 +76,7 @@ Generate embedding for a single text.
 ```json
 {
   "text": "Your text here",
-  "model": "voyage-3.5",
+  "model": "voyage-4",
   "input_type": null,
   "truncation": true,
   "output_dimension": null
@@ -85,7 +85,7 @@ Generate embedding for a single text.
 
 **Parameters:**
 - `text` (required): The input text to embed
-- `model` (optional): Model to use (default: "voyage-3.5")
+- `model` (optional): Model to use (default: "voyage-4")
 - `input_type` (optional): "query", "document", or null
 - `truncation` (optional): Whether to truncate if too long (default: true)
 - `output_dimension` (optional): 256, 512, 1024, or 2048
@@ -99,7 +99,7 @@ Generate embeddings for multiple texts (max 1,000).
 ```json
 {
   "texts": ["Text 1", "Text 2", "Text 3"],
-  "model": "voyage-3.5",
+  "model": "voyage-4",
   "input_type": null,
   "truncation": true,
   "output_dimension": null
@@ -116,7 +116,7 @@ Calculate similarity between two texts using a single model.
 {
   "text1": "First text",
   "text2": "Second text",
-  "model": "voyage-3.5",
+  "model": "voyage-4",
   "input_type": "query",
   "truncation": true,
   "output_dimension": 1024
@@ -150,7 +150,7 @@ Calculate similarity between two texts using ALL available text embedding models
       "cosine": 0.93
     },
     {
-      "model": "voyage-3.5",
+      "model": "voyage-4",
       "euclidean": 0.42,
       "dotProduct": 0.89,
       "cosine": 0.94
@@ -286,7 +286,7 @@ curl -X POST "http://localhost:8000/text/embed" \
   -H "Content-Type: application/json" \
   -d '{
     "text": "The Mediterranean diet emphasizes fish, olive oil, and vegetables.",
-    "model": "voyage-3.5"
+    "model": "voyage-4"
   }'
 ```
 
@@ -300,7 +300,7 @@ curl -X POST "http://localhost:8000/text/embed/batch" \
       "Second document",
       "Third document"
     ],
-    "model": "voyage-3.5",
+    "model": "voyage-4",
     "input_type": "document"
   }'
 ```
@@ -312,7 +312,7 @@ curl -X POST "http://localhost:8000/text/similarity" \
   -d '{
     "text1": "I like cats",
     "text2": "I also like dogs",
-    "model": "voyage-3.5"
+    "model": "voyage-4"
   }'
 ```
 
@@ -348,7 +348,7 @@ response = requests.post(
     "http://localhost:8000/text/embed",
     json={
         "text": "Your text here",
-        "model": "voyage-3.5"
+        "model": "voyage-4"
     }
 )
 embedding = response.json()["embedding"]
@@ -358,7 +358,7 @@ response = requests.post(
     "http://localhost:8000/text/embed/batch",
     json={
         "texts": ["Text 1", "Text 2", "Text 3"],
-        "model": "voyage-3.5",
+        "model": "voyage-4",
         "input_type": "document"
     }
 )
@@ -370,7 +370,7 @@ response = requests.post(
     json={
         "text1": "I like programming",
         "text2": "I enjoy coding",
-        "model": "voyage-3.5"
+        "model": "voyage-4"
     }
 )
 similarity = response.json()
@@ -409,14 +409,14 @@ for result in results["results"]:
 
 Choose based on your needs:
 
-- **voyage-3.5**: Best overall performance (default)
-- **voyage-3.5-lite**: Faster and more cost-effective
+- **voyage-4**: Best overall performance (default)
+- **voyage-4-lite**: Faster and more cost-effective
 - **voyage-3-large**: High quality embeddings
 - **voyage-code-3**: Optimized for code and technical content
 
 ### Multimodal Models
 
-- **voyage-multimodal-3**: For image and text embeddings, cross-modal similarity
+- **voyage-multimodal-3.5**: For image and text embeddings, cross-modal similarity
 
 ### Reranker Models
 

@@ -10,8 +10,8 @@ import requests
 
 app = FastAPI(
     title="Voyage.ai Toolbox - Embeddings and Rerankers",
-    description="API toolbox for Voyage.ai embeddings and rerankers including text embeddings (voyage-3-large, voyage-3.5, voyage-3.5-lite, voyage-code-3) and multimodal image embeddings",
-    version="1.0",
+    description="API toolbox for Voyage.ai embeddings and rerankers including text embeddings (voyage-4-large, voyage-4, voyage-4-lite, voyage-code-3) and multimodal image embeddings",
+    version="1.1",
     contact={
         "name": "Pat Wendorf",
         "email": "pat.wendorf@mongodb.com",
@@ -26,7 +26,7 @@ app = FastAPI(
 vo = voyageai.Client()
 
 # Supported text embedding models
-TEXT_MODELS = ["voyage-3-large", "voyage-3.5", "voyage-3.5-lite", "voyage-code-3"]
+TEXT_MODELS = ["voyage-3-large", "voyage-4", "voyage-4-lite", "voyage-code-3"]
 
 # Supported reranker models
 RERANKER_MODELS = ["rerank-2.5", "rerank-2.5-lite"]
@@ -34,14 +34,14 @@ RERANKER_MODELS = ["rerank-2.5", "rerank-2.5-lite"]
 # Pydantic models for request/response
 class TextInput(BaseModel):
     text: str
-    model: str = "voyage-3.5"
+    model: str = "voyage-4"
     input_type: Optional[str] = "document"
     truncation: Optional[bool] = True
     output_dimension: Optional[int] = 1024
 
 class BatchTextInput(BaseModel):
     texts: List[str]
-    model: str = "voyage-3.5"
+    model: str = "voyage-4"
     input_type: Optional[str] = "document"
     truncation: Optional[bool] = True
     output_dimension: Optional[int] = 1024
@@ -49,7 +49,7 @@ class BatchTextInput(BaseModel):
 class TextSimilarityInput(BaseModel):
     text1: str
     text2: str
-    model: str = "voyage-3.5"
+    model: str = "voyage-4"
     input_type: Optional[str] = "document"
     truncation: Optional[bool] = True
     output_dimension: Optional[int] = 1024
@@ -90,7 +90,7 @@ def similarity(v1, v2):
 
     return {"euclidean": float(euclidean_distance), "dotProduct": float(dot_product), "cosine": float(cosine_similarity)}
 
-def get_voyage_text_embedding(text: str, model: str = "voyage-3.5", input_type: Optional[str] = None,
+def get_voyage_text_embedding(text: str, model: str = "voyage-4", input_type: Optional[str] = None,
                                truncation: bool = True, output_dimension: Optional[int] = None):
     """Get text embedding using Voyage.ai text embedding models"""
     result = vo.embed(
@@ -102,7 +102,7 @@ def get_voyage_text_embedding(text: str, model: str = "voyage-3.5", input_type: 
     )
     return result.embeddings[0]
 
-def get_voyage_batch_text_embedding(texts: List[str], model: str = "voyage-3.5", input_type: Optional[str] = None,
+def get_voyage_batch_text_embedding(texts: List[str], model: str = "voyage-4", input_type: Optional[str] = None,
                                     truncation: bool = True, output_dimension: Optional[int] = None):
     """Get batch text embeddings using Voyage.ai text embedding models"""
     result = vo.embed(
@@ -116,12 +116,12 @@ def get_voyage_batch_text_embedding(texts: List[str], model: str = "voyage-3.5",
 
 def get_voyage_image_embedding(image):
     """Get image embedding using Voyage.ai multimodal model"""
-    result = vo.multimodal_embed([[image]], model="voyage-multimodal-3")
+    result = vo.multimodal_embed([[image]], model="voyage-multimodal-3.5.5")
     return result.embeddings[0]
 
 def get_voyage_multimodal_text_embedding(text):
     """Get text embedding using Voyage.ai multimodal model"""
-    result = vo.multimodal_embed([[text]], model="voyage-multimodal-3")
+    result = vo.multimodal_embed([[text]], model="voyage-multimodal-3.5")
     return result.embeddings[0]
 
 def get_voyage_rerank(query: str, documents: List[str], model: str = "rerank-2.5",
@@ -143,7 +143,7 @@ async def list_models():
     """List all available models"""
     return {
         "text_models": TEXT_MODELS,
-        "multimodal_models": ["voyage-multimodal-3"],
+        "multimodal_models": ["voyage-multimodal-3.5"],
         "reranker_models": RERANKER_MODELS
     }
 
@@ -153,7 +153,7 @@ async def embed_single_text(input_data: TextInput):
     Generate embedding vector for a single text using specified model.
 
     - **text**: The input text to embed
-    - **model**: Model to use (default: voyage-3.5)
+    - **model**: Model to use (default: voyage-4)
     - **input_type**: Optional type hint for the text (None, "query", or "document")
     - **truncation**: Whether to truncate text if too long (default: True)
     - **output_dimension**: Optional output dimension (256, 512, 1024, 2048)
@@ -173,7 +173,7 @@ async def embed_batch_text(input_data: BatchTextInput):
     Generate embedding vectors for multiple texts (batch processing).
 
     - **texts**: List of input texts to embed (max 1,000)
-    - **model**: Model to use (default: voyage-3.5)
+    - **model**: Model to use (default: voyage-4)
     - **input_type**: Optional type hint for the texts (None, "query", or "document")
     - **truncation**: Whether to truncate text if too long (default: True)
     - **output_dimension**: Optional output dimension (256, 512, 1024, 2048)
@@ -195,7 +195,7 @@ async def text_to_text_similarity(input_data: TextSimilarityInput):
 
     - **text1**: First text
     - **text2**: Second text
-    - **model**: Model to use (default: voyage-3.5)
+    - **model**: Model to use (default: voyage-4)
     - **input_type**: Optional type hint for the texts (None, "query", or "document")
     - **truncation**: Whether to truncate text if too long (default: True)
     - **output_dimension**: Optional output dimension (256, 512, 1024, 2048)
@@ -258,29 +258,29 @@ async def text_to_text_similarity_all_models(input_data: MultiModelTextSimilarit
 @app.post("/image/upload/vector")
 async def upload_image_vector(image: UploadFile):
     """
-    Generate embedding vector for an uploaded image using voyage-multimodal-3.
+    Generate embedding vector for an uploaded image using voyage-multimodal-3.5.
     """
     img = Image.open(image.file)
     embedding = get_voyage_image_embedding(img)
-    return {"embedding": embedding, "model": "voyage-multimodal-3"}
+    return {"embedding": embedding, "model": "voyage-multimodal-3.5"}
 
 @app.post("/image/url/vector")
 async def url_image_vector(image_url: str):
     """
-    Generate embedding vector for an image from URL using voyage-multimodal-3.
+    Generate embedding vector for an image from URL using voyage-multimodal-3.5.
     """
     response = requests.get(image_url)
     img = Image.open(BytesIO(response.content))
     embedding = get_voyage_image_embedding(img)
-    return {"embedding": embedding, "model": "voyage-multimodal-3"}
+    return {"embedding": embedding, "model": "voyage-multimodal-3.5"}
 
 @app.post("/image/text/vector")
 async def multimodal_text_vector(text: str):
     """
-    Generate embedding vector for text using voyage-multimodal-3 model.
+    Generate embedding vector for text using voyage-multimodal-3.5 model.
     """
     embedding = get_voyage_multimodal_text_embedding(text)
-    return {"embedding": embedding, "model": "voyage-multimodal-3"}
+    return {"embedding": embedding, "model": "voyage-multimodal-3.5"}
 
 # ========== IMAGE SIMILARITY ENDPOINTS ==========
 
@@ -315,7 +315,7 @@ async def url_image_image_similarity(image_url1: str, image_url2: str):
 @app.post("/image/upload/text/similarity")
 async def upload_image_text_similarity(image: UploadFile, text: str):
     """
-    Calculate similarity between an uploaded image and text using voyage-multimodal-3.
+    Calculate similarity between an uploaded image and text using voyage-multimodal-3.5.
     Returns Euclidean distance, dot product, and cosine similarity.
     """
     img = Image.open(image.file)
@@ -326,7 +326,7 @@ async def upload_image_text_similarity(image: UploadFile, text: str):
 @app.post("/image/url/text/similarity")
 async def url_image_text_similarity(image_url: str, text: str):
     """
-    Calculate similarity between an image from URL and text using voyage-multimodal-3.
+    Calculate similarity between an image from URL and text using voyage-multimodal-3.5.
     Returns Euclidean distance, dot product, and cosine similarity.
     """
     response = requests.get(image_url)
@@ -377,6 +377,6 @@ async def root():
         "message": "Welcome to VoyageToolbox API",
         "docs": "/docs",
         "text_models": TEXT_MODELS,
-        "multimodal_models": ["voyage-multimodal-3"],
+        "multimodal_models": ["voyage-multimodal-3.5"],
         "reranker_models": RERANKER_MODELS
     }
